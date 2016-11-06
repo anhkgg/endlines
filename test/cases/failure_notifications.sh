@@ -53,4 +53,4 @@ else
     ./case_failed.sh
 fi
 chmod +w sandbox/.tmp_endlines
-
+rm sandbox/.tmp_endlines
