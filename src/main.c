@@ -366,6 +366,10 @@ check_one_file(char* filename, CommandLine* cmd_line_args, FileReport* file_repo
 
     fclose(in);
 
+    if(report.error_during_conversion) {
+        fprintf(stderr, "endlines : file access error during check of %s\n", filename);
+        return FILEOP_ERROR;
+    }
     if(report.contains_non_text_chars && !cmd_line_args->binaries) {
         return SKIPPED_BINARY;
     }
