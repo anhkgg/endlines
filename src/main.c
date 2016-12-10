@@ -22,7 +22,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 
@@ -185,11 +185,19 @@ parse_cmd_line_args(int argc, char** argv) {
 #define CATCH if(partial_status != CAN_CONTINUE) { return partial_status; }
 #define CATCH_CLOSE_IN if(partial_status != CAN_CONTINUE) { fclose(in); return partial_status; }
 
+
+// Make up once a file name for all tmp file creations from this process.
 void
 initialize_session_tmp_filename(char* session_tmp_filename) {
-    struct timespec res;
-    clock_gettime(CLOCK_REALTIME, &res);
-    int suffix = res.tv_nsec % 9999999;
+    struct {
+        long safety_padding_a;
+        pid_t pid;
+        long safety_padding_b;
+    } pid_holder;
+
+    pid_holder.pid = getpid();
+
+    int suffix = (int)(((long)pid_holder.pid) % 9999999);
     sprintf(session_tmp_filename, "%s%d", TMP_FILENAME_BASE, suffix);
 }
 

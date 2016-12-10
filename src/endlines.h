@@ -19,16 +19,10 @@
 #ifndef _ENDLINES_H_
 #define _ENDLINES_H_
 
-
 #define PROGRAM_NAME "endlines"
 #define VERSION "1.8.1"
 #define BUFFERSIZE 16384
 #define TMP_FILENAME_BASE ".tmp_endlines_"
-
-
-/* Give us access to high resolution time functions on Posix */
-#define _XOPEN_SOURCE 500
-
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -38,7 +32,6 @@
 #ifndef BYTE
 #define BYTE unsigned char
 #endif
-
 
 
 #define FILEOP_STATUSES_COUNT 4
@@ -74,7 +67,6 @@ typedef struct {
 } FileReport;
 
 
-
 // file_operations.c
 struct utimbuf get_file_times(struct stat* statinfo);
 
@@ -88,7 +80,6 @@ FileOp_Status move_temp_file_to_destination(
 
 // convert_stream.c
 FileReport convert_stream(ConversionParameters p);
-
 
 
 // utils.c
