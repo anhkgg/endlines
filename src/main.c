@@ -72,7 +72,6 @@ typedef struct {
 
 // =============== ALL ABOUT CONVENTION NAMES ===============
 
-#define CL_NAMES_COUNT 11
 const cmd_line_args_to_convention cl_names[] = {
     {.name="check",   .convention=NO_CONVENTION},
     {.name="lf",      .convention=LF},
@@ -86,42 +85,26 @@ const cmd_line_args_to_convention cl_names[] = {
     {.name="cr",      .convention=CR},
     {.name="oldmac",  .convention=CR}
 };
+const int cl_names_count =
+        (int)(sizeof(cl_names)/sizeof(cl_names[0]));
 
 Convention
 read_convention_from_string(char * name) {
-    for(int i=0; i<CL_NAMES_COUNT; ++i) {
+    for(int i=0; i<cl_names_count; ++i) {
         if(!strcmp(cl_names[i].name, name)) {
             return cl_names[i].convention;
         }
     }
-    fprintf(stderr, "endlines : unknown action : %s\n", name);
+    fprintf(stderr, "%s : unknown action : %s\n", PROGRAM_NAME, name);
     exit(EXIT_FAILURE);
 }
 
-const char* convention_display_names[CONVENTIONS_COUNT];
-const char* convention_short_display_names[CONVENTIONS_COUNT];
-void
-setup_conventions_display_names() {
-    convention_display_names[NO_CONVENTION] = "No line ending";
-    convention_short_display_names[NO_CONVENTION] = "None";
-
-    convention_display_names[CR] = "Legacy Mac (CR)";
-    convention_short_display_names[CR] = "CR";
-
-    convention_display_names[LF] = "Unix (LF)";
-    convention_short_display_names[LF] = "LF";
-
-    convention_display_names[CRLF] = "Windows (CR-LF)";
-    convention_short_display_names[CRLF] = "CRLF";
-
-    convention_display_names[MIXED] = "Mixed endings";
-    convention_short_display_names[MIXED] = "Mixed";
-}
-
-
-void setup_constants() {
-    setup_conventions_display_names();
-}
+#define X(a,b,c) b,
+const char* convention_display_names[CONVENTIONS_COUNT] = {CONVENTIONS_TABLE};
+#undef X
+#define X(a,b,c) c,
+const char* convention_short_display_names[CONVENTIONS_COUNT] = {CONVENTIONS_TABLE};
+#undef X
 
 
 // =============== PARSING COMMAND LINE OPTIONS ===============
@@ -134,7 +117,7 @@ parse_command_line(int argc, char** argv) {
 
     cmd_line_invocation.filenames = malloc(argc*sizeof(void*));
     if(cmd_line_invocation.filenames == NULL) {
-        fprintf(stderr, "endlines : can't allocate memory\n");
+        fprintf(stderr, "%s : can't allocate memory\n", PROGRAM_NAME);
         exit(EXIT_FAILURE);
     }
 
@@ -161,7 +144,7 @@ parse_command_line(int argc, char** argv) {
         } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--hidden")) {
             cmd_line_invocation.process_hidden = true;
         } else {
-            fprintf(stderr, "endlines : unknown option : %s\n", argv[i]);
+            fprintf(stderr, "%s : unknown option : %s\n", PROGRAM_NAME, argv[i]);
             exit(EXIT_FAILURE);
         }
     }
@@ -219,7 +202,8 @@ pre_conversion_check(
     Conversion_Report preliminary_report = convert_stream(p);
 
     if(preliminary_report.error_during_conversion) {
-        fprintf(stderr, "endlines : file access error during preliminary check of %s\n", filename);
+        fprintf(stderr, "%s : file access error during preliminary check of %s\n",
+                PROGRAM_NAME, filename);
         return FILEOP_ERROR;
     }
 
@@ -278,7 +262,8 @@ convert_one_file(
     fclose(out);
 
     if(report.error_during_conversion) {
-        fprintf(stderr, "endlines : file access error during conversion of %s\n", filename);
+        remove(local_tmp_file_name);
+        fprintf(stderr, "%s : file access error during conversion of %s\n", PROGRAM_NAME, filename);
         return FILEOP_ERROR;
     }
     if(report.contains_non_text_chars && !invocation->binaries) {
@@ -315,7 +300,7 @@ check_one_file(char* filename, Invocation* invocation, Conversion_Report* file_r
     fclose(in);
 
     if(report.error_during_conversion) {
-        fprintf(stderr, "endlines : file access error during check of %s\n", filename);
+        fprintf(stderr, "%s : file access error during check of %s\n", PROGRAM_NAME, filename);
         return FILEOP_ERROR;
     }
     if(report.contains_non_text_chars && !invocation->binaries) {
@@ -350,11 +335,12 @@ void
 print_verbose_file_outcome(char * filename, FileOp_Status outcome, Convention source_convention) {
     switch(outcome) {
         case DONE:
-            fprintf(stderr, "endlines : %s -- %s\n",
+            fprintf(stderr, "%s : %s -- %s\n",
+                    PROGRAM_NAME,
                     convention_short_display_names[source_convention], filename);
             break;
         case SKIPPED_BINARY:
-            fprintf(stderr, "endlines : skipped probable binary %s\n", filename);
+            fprintf(stderr, "%s : skipped probable binary %s\n", PROGRAM_NAME, filename);
             break;
         default: break;
     }
@@ -362,7 +348,7 @@ print_verbose_file_outcome(char * filename, FileOp_Status outcome, Convention so
 
 void
 print_outcome_totals(Outcome_totals_for_display t) {
-    fprintf(stderr,  "\nendlines : %i file%s %s", t.done,
+    fprintf(stderr,  "\n%s : %i file%s %s", PROGRAM_NAME, t.done,
             t.done>1?"s":"", t.dry_run?"checked":"converted");
 
     if(t.done) {
@@ -455,9 +441,10 @@ convert_files(Invocation* invocation)  {
 
     if(!invocation->quiet) {
         if(invocation->dst_convention == NO_CONVENTION) {
-            fprintf(stderr, "endlines : dry run, scanning files\n");
+            fprintf(stderr, "%s : dry run, scanning files\n", PROGRAM_NAME);
         } else {
-            fprintf(stderr, "endlines : converting files to %s\n",
+            fprintf(stderr, "%s : converting files to %s\n",
+                    PROGRAM_NAME,
                     convention_display_names[invocation->dst_convention]);
         }
     }
@@ -484,14 +471,14 @@ void print_stream_conversion_outcome(Conversion_Parameters *parameters, Conversi
     Convention source_convention = get_source_convention(report);
     if(parameters->dst_convention == NO_CONVENTION) {
         char *binary_comment = report->contains_non_text_chars ? "looked like a binary stream and " : "";
-        fprintf(stderr, "endlines : stdin %shad line endings in %s\n",
-                binary_comment,
+        fprintf(stderr, "%s : stdin %shad line endings in %s\n",
+                PROGRAM_NAME, binary_comment,
                 convention_display_names[source_convention]);
     } else {
         char *binary_comment = report->contains_non_text_chars ? "(looked like a binary stream) " : "";
-        fprintf(stderr, "endlines : converted from %s in stdin %sto %s in stdout\n",
+        fprintf(stderr, "%s : converted from %s in stdin %sto %s in stdout\n",
                 convention_display_names[source_convention],
-                binary_comment,
+                PROGRAM_NAME, binary_comment,
                 convention_display_names[parameters->dst_convention]);
     }
 }
@@ -499,9 +486,10 @@ void print_stream_conversion_outcome(Conversion_Parameters *parameters, Conversi
 void convert_stdin_to_stdout(Invocation *invocation) {
     if(!invocation->quiet) {
         if(invocation->dst_convention == NO_CONVENTION) {
-            fprintf(stderr, "endlines : dry run, scanning standard input\n");
+            fprintf(stderr, "%s : dry run, scanning standard input\n", PROGRAM_NAME);
         } else {
-            fprintf(stderr, "endlines : converting standard input to %s\n",
+            fprintf(stderr, "%s : converting standard input to %s\n",
+                    PROGRAM_NAME,
                     convention_display_names[invocation->dst_convention]);
         }
     }
@@ -525,8 +513,6 @@ main(int argc, char**argv) {
     if(argc <= 1) {
         display_help_and_quit();
     }
-
-    setup_constants();
 
     Invocation cmd_line_invocation = parse_command_line(argc, argv);
 

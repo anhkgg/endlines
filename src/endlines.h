@@ -39,18 +39,22 @@ typedef enum {
     CAN_CONTINUE,  // intermediate state : no error yet
     DONE,
     SKIPPED_BINARY,
-    FILEOP_ERROR,
+    FILEOP_ERROR
 } FileOp_Status;
 
-
 #define CONVENTIONS_COUNT 5
+#define CONVENTIONS_TABLE \
+    X(NO_CONVENTION, "No line ending",  "None") \
+    X(CR,            "Legacy Mac (CR)", "CR") \
+    X(LF,            "Unix (LF)",       "LF") \
+    X(CRLF,          "Windows (CR-LF)", "CRLF") \
+    X(MIXED,         "Mixed endings",   "Mixed")
+
+#define X(a,b,c) a,
 typedef enum {
-    NO_CONVENTION,
-    CR,
-    LF,
-    CRLF,
-    MIXED
+    CONVENTIONS_TABLE
 } Convention;
+#undef X
 
 typedef struct {
     FILE* instream;
@@ -71,8 +75,8 @@ typedef struct {
 struct utimbuf get_file_times(struct stat* statinfo);
 
 FileOp_Status open_input_file_for_conversion(FILE** in,  char* in_filename);
-FileOp_Status            open_temporary_file(FILE** out, char* tmp_filename);
-FileOp_Status    open_input_file_for_dry_run(FILE** in,  char* in_filename);
+FileOp_Status open_temporary_file(FILE** out, char* tmp_filename);
+FileOp_Status open_input_file_for_dry_run(FILE** in,  char* in_filename);
 
 FileOp_Status move_temp_file_to_destination(
         char* tmp_filename, char* filename, struct stat *statinfo);
