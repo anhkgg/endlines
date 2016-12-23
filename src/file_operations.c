@@ -23,7 +23,8 @@
 
 
 struct utimbuf
-get_file_times(struct stat* statinfo) {
+get_file_times(struct stat *statinfo)
+{
     struct utimbuf file_times;
     file_times.actime = statinfo->st_atime;
     file_times.modtime = statinfo->st_mtime;
@@ -32,7 +33,8 @@ get_file_times(struct stat* statinfo) {
 
 
 FileOp_Status
-open_input_file_for_conversion(FILE** in, char* in_filename) {
+open_input_file_for_conversion(FILE **in, char *in_filename)
+{
     *in = fopen(in_filename, "rb");
     if(*in == NULL) {
         fprintf(stderr, "%s : can not read %s\n", PROGRAM_NAME, in_filename);
@@ -46,8 +48,10 @@ open_input_file_for_conversion(FILE** in, char* in_filename) {
     return CAN_CONTINUE;
 }
 
+
 FileOp_Status
-open_temporary_file(FILE** out, char* tmp_filename) {
+open_temporary_file(FILE **out, char *tmp_filename)
+{
     *out = fopen(tmp_filename, "wb");
     if(*out == NULL) {
         fprintf(stderr, "%s : can not create %s\n", PROGRAM_NAME, tmp_filename);
@@ -56,8 +60,10 @@ open_temporary_file(FILE** out, char* tmp_filename) {
     return CAN_CONTINUE;
 }
 
+
 FileOp_Status
-open_input_file_for_dry_run(FILE** in, char* in_filename) {
+open_input_file_for_dry_run(FILE **in, char *in_filename)
+{
     *in = fopen(in_filename, "rb");
     if(*in == NULL) {
         fprintf(stderr, "%s : can not read %s\n", PROGRAM_NAME, in_filename);
@@ -66,8 +72,10 @@ open_input_file_for_dry_run(FILE** in, char* in_filename) {
     return CAN_CONTINUE;
 }
 
+
 FileOp_Status
-move_temp_file_to_destination(char* tmp_filename, char* filename, struct stat *statinfo) {
+move_temp_file_to_destination(char *tmp_filename, char *filename, struct stat *statinfo)
+{
     int err = remove(filename);
     if(err) {
         fprintf(stderr, "%s : can not write over %s\n", PROGRAM_NAME, filename);

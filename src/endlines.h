@@ -57,8 +57,8 @@ typedef enum {
 #undef X
 
 typedef struct {
-    FILE* instream;
-    FILE* outstream;
+    FILE *instream;
+    FILE *outstream;
     Convention dst_convention;
     bool interrupt_if_not_like_dst_convention;
     bool interrupt_if_non_text;
@@ -72,14 +72,14 @@ typedef struct {
 
 
 // file_operations.c
-struct utimbuf get_file_times(struct stat* statinfo);
+struct utimbuf get_file_times(struct stat *statinfo);
 
-FileOp_Status open_input_file_for_conversion(FILE** in,  char* in_filename);
-FileOp_Status open_temporary_file(FILE** out, char* tmp_filename);
-FileOp_Status open_input_file_for_dry_run(FILE** in,  char* in_filename);
+FileOp_Status open_input_file_for_conversion(FILE **in,  char *in_filename);
+FileOp_Status open_temporary_file(FILE **out, char *tmp_filename);
+FileOp_Status open_input_file_for_dry_run(FILE **in,  char *in_filename);
 
 FileOp_Status move_temp_file_to_destination(
-        char* tmp_filename, char* filename, struct stat *statinfo);
+        char *tmp_filename, char *filename, struct stat *statinfo);
 
 
 // convert_stream.c
@@ -87,9 +87,9 @@ Conversion_Report convert_stream(Conversion_Parameters p);
 
 
 // utils.c
-bool has_known_binary_file_extension(char*);
+bool       has_known_binary_file_extension(char*);
 Convention get_source_convention(Conversion_Report*);
-void display_help_and_quit();
-void display_version_and_quit();
+void       display_help_and_quit();
+void       display_version_and_quit();
 
 #endif

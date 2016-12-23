@@ -25,7 +25,8 @@
 
 
 Convention
-get_source_convention(Conversion_Report* file_report) {
+get_source_convention(Conversion_Report *file_report)
+{
     Convention c = NO_CONVENTION;
     for(int i=0; i<CONVENTIONS_COUNT; i++) {
         if(file_report->count_by_convention[i] > 0) {
@@ -39,9 +40,11 @@ get_source_convention(Conversion_Report* file_report) {
     return c;
 }
 
+
 static char*
-get_file_extension(char* name) {
-    char* extension = name + strlen(name);
+get_file_extension(char *name)
+{
+    char *extension = name + strlen(name);
     while(*extension != '.' && *extension != '/' && extension != name) {
         -- extension;
     }
@@ -52,9 +55,11 @@ get_file_extension(char* name) {
     }
 }
 
+
 bool
-has_known_binary_file_extension(char* filename) {
-    char* ext = get_file_extension(filename);
+has_known_binary_file_extension(char *filename)
+{
+    char *ext = get_file_extension(filename);
     for(int i=0; i<known_binary_file_extensions_count; i++) {
         if( !strcmp(ext, known_binary_file_extensions[i]) ) {
             return true;
@@ -65,7 +70,8 @@ has_known_binary_file_extension(char* filename) {
 
 
 void
-display_help_and_quit() {
+display_help_and_quit()
+{
     fprintf(stderr, "\n"
                     "  %s ACTION [OPTIONS] [FILES]\n\n"
 
@@ -95,7 +101,8 @@ display_help_and_quit() {
 
 
 void
-display_version_and_quit() {
+display_version_and_quit()
+{
     fprintf(stderr, "\n   * %s version %s \n"
 
                     "   * Copyright 2014-2016 Mathias Dolidon\n\n"
