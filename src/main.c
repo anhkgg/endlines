@@ -227,20 +227,16 @@ convert_one_file(char *filename, struct stat *statinfo,
     FILE *in  = NULL;
     FILE *out = NULL;
     static char session_tmp_filename[40] = "";
-    char local_tmp_file_name[WALKERS_MAX_PATH_LENGTH];
-    struct utimbuf original_file_times = get_file_times(statinfo);
-
     if(session_tmp_filename[0]==0) {
         initialize_session_tmp_filename(session_tmp_filename);
     }
+    char local_tmp_file_name[WALKERS_MAX_PATH_LENGTH];
+    struct utimbuf original_file_times = get_file_times(statinfo);
+
     TRY open_input_file_for_conversion(&in, filename); CATCH
     TRY pre_conversion_check(in, filename, file_report, invocation); CATCH_CLOSE_IN
     rewind(in);
-    int tmp_path_err = make_filename_in_same_location(filename, session_tmp_filename, local_tmp_file_name);
-    if(tmp_path_err) {
-        fclose(in);
-        return FILEOP_ERROR;
-    }
+    TRY make_filename_in_same_location(filename, session_tmp_filename, local_tmp_file_name); CATCH_CLOSE_IN
     TRY open_temporary_file(&out, local_tmp_file_name); CATCH_CLOSE_IN
 
     Conversion_Parameters p = {
@@ -326,15 +322,15 @@ void
 print_verbose_file_outcome(char *filename, FileOp_Status outcome, Convention source_convention)
 {
     switch(outcome) {
-        case DONE:
-            fprintf(stderr, "%s : %s -- %s\n",
-                    PROGRAM_NAME,
-                    convention_short_display_names[source_convention], filename);
-            break;
-        case SKIPPED_BINARY:
-            fprintf(stderr, "%s : skipped probable binary %s\n", PROGRAM_NAME, filename);
-            break;
-        default: break;
+    case DONE:
+        fprintf(stderr, "%s : %s -- %s\n",
+                PROGRAM_NAME,
+                convention_short_display_names[source_convention], filename);
+        break;
+    case SKIPPED_BINARY:
+        fprintf(stderr, "%s : skipped probable binary %s\n", PROGRAM_NAME, filename);
+        break;
+    default: break;
     }
 }
 

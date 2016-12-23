@@ -142,19 +142,20 @@ push_word(word_t w, Buffered_stream *b)
     bool err = false;
     if(b->stream) {
         switch(b->wordLayout) {
-            case WT_1BYTE:
-                err = err || push_byte( (w & 0x000000FF), b);
-                break;
-            case WT_2BYTE_LE:
-                err = err || push_byte( (w & 0x000000FF), b);
-                err = err || push_byte( ((w & 0x0000FF00) >> 8), b);
-                break;
-            case WT_2BYTE_BE:
-                err = err || push_byte( ((w & 0x0000FF00) >> 8), b);
-                err = err || push_byte( (w & 0x000000FF), b);
-                break;
+        case WT_1BYTE:
+            err = err || push_byte( (w & 0x000000FF), b);
+            break;
+        case WT_2BYTE_LE:
+            err = err || push_byte( (w & 0x000000FF), b);
+            err = err || push_byte( ((w & 0x0000FF00) >> 8), b);
+            break;
+        case WT_2BYTE_BE:
+            err = err || push_byte( ((w & 0x0000FF00) >> 8), b);
+            err = err || push_byte( (w & 0x000000FF), b);
+            break;
         default:
-            fprintf(stderr, "endlines : convert_stream.push_word called on a stream with an unknown word layout ; aborting !\n");
+            fprintf(stderr, "endlines : convert_stream.push_word called on a stream with"
+                            "an unknown word layout ; aborting !\n");
             exit(EXIT_FAILURE);
         }
     }
@@ -166,18 +167,19 @@ push_newline(Convention convention, Buffered_stream *b)
 {
     bool err = false;
     switch(convention) {
-        case CR:   
-            err = err || push_word(13, b);
-            break;
-        case LF:
-            err = err || push_word(10, b);
-            break;
-        case CRLF:
-            err = err || push_word(13, b);
-            err = err || push_word(10, b);
-            break;
-        default:
-            break;
+    case CR:
+        err = err || push_word(13, b);
+        break;
+    case LF:
+        err = err || push_word(10, b);
+        break;
+    case CRLF:
+        err = err || push_word(13, b);
+        err = err || push_word(10, b);
+        break;
+    default:
+        fprintf(stderr, "endlines : convert_stream.push_newline called with an unknown convention ; aborting !\n");
+        exit(EXIT_FAILURE);
     }
     return err;
 }
@@ -217,21 +219,22 @@ pull_word(Buffered_stream *b)
 {
     word_t b1, b2, w;
     switch(b->wordLayout) {
-        case WT_1BYTE:
-            return (word_t) pull_byte(b);
-        case WT_2BYTE_LE:
-            b1 = (word_t) pull_byte(b);
-            b2 = (word_t) pull_byte(b);
-            w = b1 + (b2<<8);
-            return w;
-        case WT_2BYTE_BE:
-            b1 = (word_t) pull_byte(b);
-            b2 = (word_t) pull_byte(b);
-            w = (b1<<8) + b2;
-            return w;
-        default:
-            fprintf(stderr, "endlines : convert_stream.pull_word called on a stream with an unknown word layout ; aborting !\n");
-            exit(EXIT_FAILURE);
+    case WT_1BYTE:
+        return (word_t) pull_byte(b);
+    case WT_2BYTE_LE:
+        b1 = (word_t) pull_byte(b);
+        b2 = (word_t) pull_byte(b);
+        w = b1 + (b2<<8);
+        return w;
+    case WT_2BYTE_BE:
+        b1 = (word_t) pull_byte(b);
+        b2 = (word_t) pull_byte(b);
+        w = (b1<<8) + b2;
+        return w;
+    default:
+        fprintf(stderr, "endlines : convert_stream.pull_word called on a stream with "
+                        "an unknown word layout ; aborting !\n");
+        exit(EXIT_FAILURE);
     }
 }
 

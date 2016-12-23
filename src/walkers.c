@@ -166,35 +166,6 @@ append_filename_to_base_path(char *base_path, int base_path_length, char *filena
 }
 
 
-int
-make_filename_in_same_location(char *reference_name_and_path, char *wanted_name, char *destination)
-{
-    int reflen = strlen(reference_name_and_path);
-    if(reflen>=WALKERS_MAX_PATH_LENGTH) {
-        fprintf(stderr, "%s : pathname exceeding maximum length : %s\n",
-                PROGRAM_NAME, reference_name_and_path);
-        return 1;
-    }
-    int filename_start = reflen;
-    while(filename_start > 0) {
-        filename_start --;
-        if(reference_name_and_path[filename_start]=='/') {
-            filename_start ++;
-            break;
-        }
-    }
-    int wanted_length = strlen(wanted_name);
-    if(wanted_length + filename_start + 1 >= WALKERS_MAX_PATH_LENGTH) {
-        fprintf(stderr, "%s : pathname exceeding maximum length : %s on %s\n",
-                PROGRAM_NAME, wanted_name, reference_name_and_path);
-        return 1;
-    }
-    strcpy(destination, reference_name_and_path);
-    strcpy(&(destination[filename_start]), wanted_name);
-    return 0;
-}
-
-
 static void
 reset_base_path_termination(char *base_path, int base_path_length)
 {
