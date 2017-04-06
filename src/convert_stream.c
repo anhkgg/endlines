@@ -167,6 +167,8 @@ push_newline(Convention convention, Buffered_stream *b)
 {
     bool err = false;
     switch(convention) {
+    case NO_CONVENTION:
+        break;
     case CR:
         err = err || push_word(13, b);
         break;

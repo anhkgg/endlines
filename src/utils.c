@@ -105,7 +105,7 @@ display_version_and_quit()
 {
     fprintf(stderr, "\n   * %s version %s \n"
 
-                    "   * Copyright 2014-2016 Mathias Dolidon\n\n"
+                    "   * Copyright 2014-2017 Mathias Dolidon\n\n"
 
                     "   Licensed under the Apache License, Version 2.0 (the \"License\");\n"
                     "   you may not use this file except in compliance with the License.\n"
