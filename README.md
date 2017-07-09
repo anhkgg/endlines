@@ -53,7 +53,7 @@ Let the help screen say it all :
                 -r / --recurse  : recurse into directories.
 
       Examples  endlines check *.txt
-                endlines linux -k -r aFolder anotherFolder
+                endlines linux -kr aFolder anotherFolder
 
 
 ## Install
